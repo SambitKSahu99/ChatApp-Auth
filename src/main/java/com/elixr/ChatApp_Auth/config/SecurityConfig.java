@@ -4,11 +4,10 @@ import com.elixr.ChatApp_Auth.contants.AuthConstants;
 import com.elixr.ChatApp_Auth.contants.UrlConstants;
 import com.elixr.ChatApp_Auth.filter.JwtAuthenticationEntryPoint;
 import com.elixr.ChatApp_Auth.filter.JwtFilter;
+import com.elixr.ChatApp_Auth.service.LogoutHandlerService;
 import com.elixr.ChatApp_Auth.service.UserDetailServiceImplementation;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -20,7 +19,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -34,11 +32,13 @@ public class SecurityConfig {
     private final UserDetailServiceImplementation userDetailService;
     private final JwtFilter jwtFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final LogoutHandlerService logoutHandlerService;
 
-    public SecurityConfig(UserDetailServiceImplementation userDetailService, JwtFilter jwtFilter, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
+    public SecurityConfig(UserDetailServiceImplementation userDetailService, JwtFilter jwtFilter, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, LogoutHandlerService logoutHandlerService) {
         this.userDetailService = userDetailService;
         this.jwtFilter = jwtFilter;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.logoutHandlerService = logoutHandlerService;
     }
 
     @Bean
@@ -46,7 +46,7 @@ public class SecurityConfig {
         return httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .cors(cors->cors.configurationSource(corsFilter()))
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers(UrlConstants.LOGIN_API_ENDPOINT).permitAll() // Allow login page without authentication
+                        .requestMatchers(UrlConstants.LOGIN_API_ENDPOINT).permitAll()
                         .anyRequest().authenticated()) // All other requests need authentication
                 .formLogin(form -> form
                         .loginPage(UrlConstants.LOGIN_API_ENDPOINT) // Set your login page URL
@@ -55,8 +55,7 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutUrl(UrlConstants.LOGOUT_URL) // Specify logout URL
-                        .logoutSuccessUrl(UrlConstants.LOGOUT_SUCCESS_URL) // Redirect after logout
+                        .logoutSuccessHandler(logoutHandlerService)
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

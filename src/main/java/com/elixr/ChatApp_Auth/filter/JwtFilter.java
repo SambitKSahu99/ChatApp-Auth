@@ -9,6 +9,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.MDC;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -47,12 +48,15 @@ public class JwtFilter extends OncePerRequestFilter {
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+                    MDC.put("userName",userName);
                 }
             }
         filterChain.doFilter(request,response);
         }catch(JwtException exception){
+            MDC.clear();
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, MessagesConstants.NOT_VALID_TOKEN);
         }catch (Exception exception){
+            MDC.clear();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,MessagesConstants.SOME_ERROR_OCCURRED);
         }
     }

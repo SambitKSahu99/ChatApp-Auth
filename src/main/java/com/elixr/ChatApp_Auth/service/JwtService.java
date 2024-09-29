@@ -1,9 +1,7 @@
 package com.elixr.ChatApp_Auth.service;
 
 import com.elixr.ChatApp_Auth.contants.AuthConstants;
-import com.elixr.ChatApp_Auth.contants.MessagesConstants;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

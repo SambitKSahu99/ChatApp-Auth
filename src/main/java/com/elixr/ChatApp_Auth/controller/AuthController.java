@@ -23,7 +23,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = AuthConstants.ALLOWED_HEADERS)
@@ -47,17 +46,19 @@ public class AuthController {
         String currentUser = authUserDto.getUserName();
         LoginResponseDto responseDto = authService.login(authUserDto);
         responseDto.setUserName(currentUser);
-        MDC.put("userName",currentUser);
-        log.info(LoggerInfoConstants.USER_LOGIN,currentUser);
+        MDC.put("userName", currentUser);
+        log.info(LoggerInfoConstants.USER_LOGIN, currentUser);
         return new ResponseEntity<>(new Response(responseDto), HttpStatus.OK);
     }
 
     @PostMapping(UrlConstants.VERIFY_TOKEN_ENDPOINT)
     public ResponseEntity<String> verifyToken(@RequestHeader(AuthConstants.AUTHORIZATION_HEADER_TYPE) String token) throws UserException {
         String jwtToken = token.substring(7);
+        log.info(LoggerInfoConstants.VERIFYING_TOKEN);
         String userName = jwtService.extractUserName(jwtToken);
         UserDetails userDetails = userDetailServiceImplementation.loadUserByUsername(userName);
         boolean isValid = jwtService.validateToken(jwtToken, userDetails);
+        log.info(LoggerInfoConstants.TOKEN_VERIFICATION_SUCCESS);
         return new ResponseEntity<>(userName, HttpStatus.OK);
     }
 

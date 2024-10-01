@@ -1,7 +1,6 @@
 package com.elixr.ChatApp_Auth.service;
 
 import com.elixr.ChatApp_Auth.contants.LoggerInfoConstants;
-import com.elixr.ChatApp_Auth.contants.UrlConstants;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,11 +1,11 @@
 package com.elixr.ChatApp_Auth.config;
 
 import com.elixr.ChatApp_Auth.contants.AuthConstants;
-import com.elixr.ChatApp_Auth.contants.UrlConstants;
 import com.elixr.ChatApp_Auth.filter.JwtAuthenticationEntryPoint;
 import com.elixr.ChatApp_Auth.filter.JwtFilter;
 import com.elixr.ChatApp_Auth.service.LogoutHandlerService;
 import com.elixr.ChatApp_Auth.service.UserDetailServiceImplementation;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,6 +33,12 @@ public class SecurityConfig {
     private final JwtFilter jwtFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final LogoutHandlerService logoutHandlerService;
+    @Value(AuthConstants.UI_URL_VALUE)
+    private String uiBaseUrl;
+    @Value(AuthConstants.MESSAGE_URL_VALUE)
+    private String messageServiceBaseUrl;
+    @Value(AuthConstants.USER_SERVICE_URL_VALUE)
+    private String userServiceBaseUrl;
 
     public SecurityConfig(UserDetailServiceImplementation userDetailService, JwtFilter jwtFilter, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, LogoutHandlerService logoutHandlerService) {
         this.userDetailService = userDetailService;
@@ -46,12 +52,12 @@ public class SecurityConfig {
         return httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .cors(cors->cors.configurationSource(corsFilter()))
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers(UrlConstants.LOGIN_API_ENDPOINT).permitAll()
+                        .requestMatchers(AuthConstants.LOGIN_API_ENDPOINT).permitAll()
                         .anyRequest().authenticated()) // All other requests need authentication
                 .formLogin(form -> form
-                        .loginPage(UrlConstants.LOGIN_API_ENDPOINT) // Set your login page URL
-                        .loginProcessingUrl(UrlConstants.LOGIN_PAGE_URL) // Endpoint for login processing
-                        .defaultSuccessUrl(UrlConstants.DEFAULT_SUCCESS_URL, true) // Redirect after successful login
+                        .loginPage(AuthConstants.LOGIN_API_ENDPOINT) // Set your login page URL
+                        .loginProcessingUrl(AuthConstants.LOGIN_PAGE_URL) // Endpoint for login processing
+                        .defaultSuccessUrl(AuthConstants.DEFAULT_SUCCESS_URL, true) // Redirect after successful login
                         .permitAll()
                 )
                 .logout(logout -> logout
@@ -86,7 +92,7 @@ public class SecurityConfig {
     public UrlBasedCorsConfigurationSource corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(UrlConstants.UI_URL,UrlConstants.USER_URL,UrlConstants.MESSAGE_URL)); // Frontend URL
+        config.setAllowedOrigins(List.of(uiBaseUrl,userServiceBaseUrl,messageServiceBaseUrl)); // Frontend URL
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Allowed HTTP methods
         config.setAllowedHeaders(List.of(AuthConstants.ALLOWED_HEADERS)); // Allowed headers
         config.setAllowCredentials(true);

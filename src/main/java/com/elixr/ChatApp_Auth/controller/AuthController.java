@@ -2,7 +2,6 @@ package com.elixr.ChatApp_Auth.controller;
 
 import com.elixr.ChatApp_Auth.contants.AuthConstants;
 import com.elixr.ChatApp_Auth.contants.LoggerInfoConstants;
-import com.elixr.ChatApp_Auth.contants.UrlConstants;
 import com.elixr.ChatApp_Auth.dto.AuthUserDto;
 import com.elixr.ChatApp_Auth.dto.LoginResponseDto;
 import com.elixr.ChatApp_Auth.exceptionhandling.UserException;
@@ -41,7 +40,7 @@ public class AuthController {
         this.logoutHandlerService = logoutHandlerService;
     }
 
-    @PostMapping(UrlConstants.LOGIN_API_ENDPOINT)
+    @PostMapping(AuthConstants.LOGIN_API_ENDPOINT)
     public ResponseEntity<Response> login(@RequestBody AuthUserDto authUserDto) throws UserException {
         String currentUser = authUserDto.getUserName();
         LoginResponseDto responseDto = authService.login(authUserDto);
@@ -51,7 +50,7 @@ public class AuthController {
         return new ResponseEntity<>(new Response(responseDto), HttpStatus.OK);
     }
 
-    @PostMapping(UrlConstants.VERIFY_TOKEN_ENDPOINT)
+    @PostMapping(AuthConstants.VERIFY_TOKEN_ENDPOINT)
     public ResponseEntity<String> verifyToken(@RequestHeader(AuthConstants.AUTHORIZATION_HEADER_TYPE) String token) throws UserException {
         String jwtToken = token.substring(7);
         log.info(LoggerInfoConstants.VERIFYING_TOKEN);
@@ -62,7 +61,7 @@ public class AuthController {
         return new ResponseEntity<>(userName, HttpStatus.OK);
     }
 
-    @PostMapping(UrlConstants.LOGOUT_URL)
+    @PostMapping(AuthConstants.LOGOUT_URL)
     public void logout(@RequestBody String currentUser, HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
         logoutHandlerService.onLogoutSuccess(request, response, authentication);
     }

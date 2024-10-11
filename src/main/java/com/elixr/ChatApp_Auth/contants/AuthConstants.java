@@ -10,7 +10,6 @@ public class AuthConstants {
     public static final String DEFAULT_SUCCESS_URL = "/index.html";
     public static final String LOGIN_API_ENDPOINT = "/login";
     public static final String LOGIN_PAGE_URL = "/login.html";
-    public static final String LOGOUT_SUCCESS_URL = "/login?logout";
     public static final String LOGOUT_URL = "/logout";
     public static final String VERIFY_TOKEN_ENDPOINT = "/verifyToken";
     private static final String MESSAGE_BASEURL = "message.baseurl";

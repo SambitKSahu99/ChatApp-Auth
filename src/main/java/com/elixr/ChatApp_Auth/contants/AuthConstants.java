@@ -4,7 +4,6 @@ public class AuthConstants {
     public static final String ALLOWED_HEADERS = "*";
     public static final String AUTHORIZATION_HEADER_TYPE = "Authorization";
     public static final String BEARER = "Bearer";
-    public static final String KEY_GENERATOR_ALGORITHM = "HmacSHA256";
     public static final String REGISTERED_CORS_PATTERN = "/**";
     public static final String USER_COLLECTION_NAME = "users";
     public static final String DEFAULT_SUCCESS_URL = "/index.html";
@@ -12,6 +11,8 @@ public class AuthConstants {
     public static final String LOGIN_PAGE_URL = "/login.html";
     public static final String LOGOUT_URL = "/logout";
     public static final String VERIFY_TOKEN_ENDPOINT = "/verifyToken";
+    private static final String KEY = "secret.key";
+    public static final String SECRET_KEY = "${"+KEY+"}";
     private static final String MESSAGE_BASEURL = "message.baseurl";
     public static final String MESSAGE_URL_VALUE = "${" + MESSAGE_BASEURL + "}";
     private static final String UI_BASEURL = "ui.baseurl";

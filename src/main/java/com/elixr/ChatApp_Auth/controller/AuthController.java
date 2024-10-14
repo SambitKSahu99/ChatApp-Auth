@@ -50,17 +50,10 @@ public class AuthController {
         return new ResponseEntity<>(new Response(responseDto), HttpStatus.OK);
     }
 
-    @PostMapping(AuthConstants.VERIFY_TOKEN_ENDPOINT)
-    public ResponseEntity<String> verifyToken(@RequestHeader(AuthConstants.AUTHORIZATION_HEADER_TYPE) String token) throws UserException {
-        String jwtToken = token.substring(7);
-        log.info(LoggerInfoConstants.VERIFYING_TOKEN);
-        String userName = jwtService.extractUserName(jwtToken);
-        UserDetails userDetails = userDetailServiceImplementation.loadUserByUsername(userName);
-        boolean isValid = jwtService.validateToken(jwtToken, userDetails);
-        log.info(LoggerInfoConstants.TOKEN_VERIFICATION_SUCCESS);
-        return new ResponseEntity<>(userName, HttpStatus.OK);
+    @GetMapping("/ok")
+    public String okWorking(){
+        return "Ok working";
     }
-
     @PostMapping(AuthConstants.LOGOUT_URL)
     public void logout(@RequestBody String currentUser, HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
         logoutHandlerService.onLogoutSuccess(request, response, authentication);

@@ -5,13 +5,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,17 +18,8 @@ import java.util.function.Function;
 @Component
 public class JwtService {
 
-    private final String secretKey;
-
-    public JwtService() {
-        try {
-            KeyGenerator keyGen = KeyGenerator.getInstance(AuthConstants.KEY_GENERATOR_ALGORITHM);
-            SecretKey key = keyGen.generateKey();
-            secretKey = Base64.getEncoder().encodeToString(key.getEncoded());
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    @Value(AuthConstants.SECRET_KEY)
+    private String secretKey;
 
     public String generateToken(String userName) {
         Map<String, Object> tokenClaimsMap = new HashMap<>();
@@ -39,15 +28,10 @@ public class JwtService {
                 .add(tokenClaimsMap)
                 .subject(userName)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 1000))
+                .expiration(new Date(System.currentTimeMillis() + 5 * 60 * 60 * 1000))
                 .and()
-                .signWith(getKey())
+                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
                 .compact();
-    }
-
-    private SecretKey getKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String extractUserName(String token) {
@@ -61,7 +45,7 @@ public class JwtService {
 
     private Claims extractAllClaims(String token) {
             return Jwts.parser()
-                    .verifyWith(getKey())
+                    .verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
@@ -79,5 +63,4 @@ public class JwtService {
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
-
 }
